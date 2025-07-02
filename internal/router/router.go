@@ -9,6 +9,7 @@ import (
 type Deps struct {
 	AuthHandler    *handler.AuthHandler
 	MessageHandler *handler.MessageHandler
+	WsHandler      *handler.WSHandler
 }
 
 func SetupRouter(deps Deps) *gin.Engine {
@@ -17,6 +18,8 @@ func SetupRouter(deps Deps) *gin.Engine {
 	// Публичные маршруты
 	r.POST("/register", deps.AuthHandler.Register)
 	r.POST("/login", deps.AuthHandler.Login)
+
+	r.GET("/ws", deps.WsHandler.ServerWS)
 
 	// Защищённые маршруты
 	auth := r.Group("/")

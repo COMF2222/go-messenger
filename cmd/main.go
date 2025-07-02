@@ -9,9 +9,12 @@ import (
 	"github.com/COMF2222/go-messenger/internal/repository"
 	"github.com/COMF2222/go-messenger/internal/router"
 	"github.com/COMF2222/go-messenger/internal/service"
+	"github.com/COMF2222/go-messenger/internal/ws"
 )
 
 func main() {
+	hub := ws.NewHub()
+	go hub.Run()
 	cfg := config.LoadConfig()
 
 	db, err := repository.NewPostgresDB(cfg)
@@ -29,9 +32,12 @@ func main() {
 	messageService := service.NewMessageService(messageRepo)
 	messageHandler := handler.NewMessageHandler(messageService)
 
+	wsHandler := handler.NewWSHandler(hub, messageService)
+
 	r := router.SetupRouter(router.Deps{
 		AuthHandler:    authHandler,
 		MessageHandler: messageHandler,
+		WsHandler:      wsHandler,
 	})
 
 	port := os.Getenv("PORT")

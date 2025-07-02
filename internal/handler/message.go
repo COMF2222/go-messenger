@@ -30,7 +30,7 @@ func (h *MessageHandler) SendMessage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат"})
 	}
 
-	msg := &model.Messages{
+	msg := &model.Message{
 		SenderID:   userID,
 		ReceiverID: input.ReceiverID,
 		Text:       input.Text,

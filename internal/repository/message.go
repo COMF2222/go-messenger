@@ -16,7 +16,7 @@ func NewMessageRepository(db *pgxpool.Pool) *MessageRepository {
 	return &MessageRepository{db: db}
 }
 
-func (r *MessageRepository) SaveMessage(ctx context.Context, msg *model.Messages) error {
+func (r *MessageRepository) SaveMessage(ctx context.Context, msg *model.Message) error {
 	query := `
 		INSERT INTO messages (sender_id, receiver_id, text, status)
 		VALUES ($1, $2, $3, $4)
@@ -29,7 +29,7 @@ func (r *MessageRepository) SaveMessage(ctx context.Context, msg *model.Messages
 	return nil
 }
 
-func (r *MessageRepository) GetMessageBetween(ctx context.Context, user1ID, user2ID int) ([]*model.Messages, error) {
+func (r *MessageRepository) GetMessageBetween(ctx context.Context, user1ID, user2ID int) ([]*model.Message, error) {
 	query := `
 		SELECT id, sender_id, receiver_id, text, status, created_at
 		from messages
@@ -43,9 +43,9 @@ func (r *MessageRepository) GetMessageBetween(ctx context.Context, user1ID, user
 	}
 	defer rows.Close()
 
-	var messages []*model.Messages
+	var messages []*model.Message
 	for rows.Next() {
-		var msg model.Messages
+		var msg model.Message
 		if err := rows.Scan(
 			&msg.ID, &msg.SenderID, &msg.ReceiverID, &msg.Text, &msg.Status, &msg.CreatedAt,
 		); err != nil {
