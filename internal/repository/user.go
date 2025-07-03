@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/COMF2222/go-messenger/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -37,4 +39,42 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.U
 		return nil, errors.New("user not found")
 	}
 	return &user, nil
+}
+
+func (r *UserRepository) GetUsersByIDs(ctx context.Context, ids []int) ([]*model.User, error) {
+	if len(ids) == 0 {
+		return []*model.User{}, nil
+	}
+
+	params := make([]string, len(ids))
+	args := make([]interface{}, len((ids)))
+	for i, id := range ids {
+		params[i] = fmt.Sprintf("$%d", i+1)
+		args[i] = id
+	}
+
+	query := fmt.Sprintf(`
+		SELECT id, username
+		FROM users
+		WHERE id IN (%s)
+	`, strings.Join(params, ", "))
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		fmt.Println("GetUsersByIDs query err:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*model.User
+	for rows.Next() {
+		var u model.User
+		if err := rows.Scan(&u.ID, &u.Username); err != nil {
+			fmt.Println("GetUsersByIDs scan err:", err)
+			return nil, err
+		}
+		users = append(users, &u)
+	}
+
+	return users, nil
 }

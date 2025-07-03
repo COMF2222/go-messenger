@@ -56,3 +56,33 @@ func (r *MessageRepository) GetMessageBetween(ctx context.Context, user1ID, user
 
 	return messages, nil
 }
+
+func (r *MessageRepository) GetInterlocutors(ctx context.Context, userID int) ([]int, error) {
+	query := `
+		SELECT DISTINCT
+			CASE
+				WHEN sender_id = $1 THEN receiver_id
+				ELSE sender_id
+			END AS interclocutor_id
+		FROM messages
+		WHERE sender_id = $1 OR receiver_id = $1;
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("GetInterlocutors query: %w", err)
+	}
+	defer rows.Close()
+
+	var ids []int
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			return nil, fmt.Errorf("rows.Scan: %w", err)
+		}
+		ids = append(ids, id)
+	}
+
+	fmt.Println("Interlocutors:", ids)
+	return ids, nil
+}

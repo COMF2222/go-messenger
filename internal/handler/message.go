@@ -60,3 +60,16 @@ func (h *MessageHandler) GetMessages(c *gin.Context) {
 
 	c.JSON(http.StatusOK, msgs)
 }
+
+// GET /interlocutors
+func (h *MessageHandler) GetInterlocutors(c *gin.Context) {
+	userID := c.GetInt("user_id")
+
+	users, err := h.messageService.GetInterlocutorsUsers(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Не удалось получить список собеседников"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}

@@ -29,7 +29,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 
 	messageRepo := repository.NewMessageRepository(db)
-	messageService := service.NewMessageService(messageRepo)
+	messageService := service.NewMessageService(messageRepo, userRepo)
 	messageHandler := handler.NewMessageHandler(messageService)
 
 	wsHandler := handler.NewWSHandler(hub, messageService)

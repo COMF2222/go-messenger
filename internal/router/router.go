@@ -26,6 +26,7 @@ func SetupRouter(deps Deps) *gin.Engine {
 	auth.Use(middleware.AuthMiddleware())
 	auth.POST("/messages", deps.MessageHandler.SendMessage)
 	auth.GET("/messages", deps.MessageHandler.GetMessages)
+	auth.GET("/interlocutors", deps.MessageHandler.GetInterlocutors)
 
 	return r
 }

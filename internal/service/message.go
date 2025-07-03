@@ -8,11 +8,12 @@ import (
 )
 
 type MessageService struct {
-	repo *repository.MessageRepository
+	repo     *repository.MessageRepository
+	userRepo *repository.UserRepository
 }
 
-func NewMessageService(repo *repository.MessageRepository) *MessageService {
-	return &MessageService{repo: repo}
+func NewMessageService(repo *repository.MessageRepository, userRepo *repository.UserRepository) *MessageService {
+	return &MessageService{repo: repo, userRepo: userRepo}
 }
 
 func (s *MessageService) SendMessage(ctx context.Context, msg *model.Message) error {
@@ -22,4 +23,16 @@ func (s *MessageService) SendMessage(ctx context.Context, msg *model.Message) er
 
 func (s *MessageService) GetConversation(ctx context.Context, userID1, userID2 int) ([]*model.Message, error) {
 	return s.repo.GetMessageBetween(ctx, userID1, userID2)
+}
+
+func (s *MessageService) GetInterlocutors(ctx context.Context, userID int) ([]int, error) {
+	return s.repo.GetInterlocutors(ctx, userID)
+}
+
+func (s *MessageService) GetInterlocutorsUsers(ctx context.Context, userID int) ([]*model.User, error) {
+	ids, err := s.repo.GetInterlocutors(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return s.userRepo.GetUsersByIDs(ctx, ids)
 }
