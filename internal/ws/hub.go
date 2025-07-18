@@ -1,6 +1,10 @@
 package ws
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/COMF2222/go-messenger/internal/session"
+)
 
 // Client - подключение конктретного пользователя
 type Client struct {
@@ -44,6 +48,8 @@ func (h *Hub) Run() {
 			h.Clients[client.UserID][client] = true
 			h.mu.Unlock()
 
+			_ = session.SetUserOnline(client.UserID)
+
 		case client := <-h.Unregister:
 			h.mu.Lock()
 			if _, ok := h.Clients[client.UserID][client]; ok {
@@ -51,6 +57,7 @@ func (h *Hub) Run() {
 				close(client.Send)
 				if len(h.Clients[client.UserID]) == 0 {
 					delete(h.Clients, client.UserID)
+					_ = session.SetUserOffline(client.UserID)
 				}
 			}
 			h.mu.Unlock()

@@ -9,6 +9,7 @@ import (
 	"github.com/COMF2222/go-messenger/internal/repository"
 	"github.com/COMF2222/go-messenger/internal/router"
 	"github.com/COMF2222/go-messenger/internal/service"
+	"github.com/COMF2222/go-messenger/internal/session"
 	"github.com/COMF2222/go-messenger/internal/ws"
 )
 
@@ -16,6 +17,8 @@ func main() {
 	hub := ws.NewHub()
 	go hub.Run()
 	cfg := config.LoadConfig()
+
+	session.InitRedis()
 
 	db, err := repository.NewPostgresDB(cfg)
 	if err != nil {

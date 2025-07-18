@@ -19,6 +19,7 @@ func SetupRouter(deps Deps) *gin.Engine {
 	r.POST("/register", deps.AuthHandler.Register)
 	r.POST("/login", deps.AuthHandler.Login)
 
+	r.GET("/online/:id", handler.GetOnlineStatus)
 	r.GET("/ws", deps.WsHandler.ServerWS)
 
 	// Защищённые маршруты
