@@ -6,14 +6,12 @@ import (
 	"github.com/COMF2222/go-messenger/internal/session"
 )
 
-// Client - подключение конктретного пользователя
 type Client struct {
 	UserID int
 	Conn   *Connection
 	Send   chan []byte
 }
 
-// Hub - главный менеджер WS соединений
 type Hub struct {
 	Clients    map[int]map[*Client]bool
 	Register   chan *Client
@@ -47,7 +45,6 @@ func (h *Hub) Run() {
 			}
 			h.Clients[client.UserID][client] = true
 			h.mu.Unlock()
-
 			_ = session.SetUserOnline(client.UserID)
 
 		case client := <-h.Unregister:
@@ -76,4 +73,17 @@ func (h *Hub) Run() {
 			h.mu.Unlock()
 		}
 	}
+}
+
+// Интерфейсные методы
+func (h *Hub) RegisterClient(client *Client) {
+	h.Register <- client
+}
+
+func (h *Hub) UnregisterClient(client *Client) {
+	h.Unregister <- client
+}
+
+func (h *Hub) BroadcastMessage(msg WSMessage) {
+	h.Broadcast <- msg
 }

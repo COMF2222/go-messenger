@@ -8,11 +8,11 @@ import (
 )
 
 type MessageService struct {
-	repo     *repository.MessageRepository
-	userRepo *repository.UserRepository
+	repo     repository.MessageRepositoryInterface
+	userRepo repository.UserRepositoryInterface
 }
 
-func NewMessageService(repo *repository.MessageRepository, userRepo *repository.UserRepository) *MessageService {
+func NewMessageService(repo repository.MessageRepositoryInterface, userRepo repository.UserRepositoryInterface) *MessageService {
 	return &MessageService{repo: repo, userRepo: userRepo}
 }
 
