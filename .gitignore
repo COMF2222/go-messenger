@@ -6,3 +6,5 @@
 .DS_Store
 bin/
 vendor/
+bash.sh
+dp.md
